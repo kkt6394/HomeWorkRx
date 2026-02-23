@@ -48,7 +48,11 @@ final class PersonTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-     
+    func configureCell(name: String) {
+        usernameLabel.text = name
+        profileImageView.image = UIImage(systemName: "info")
+        
+    }
     
     private func configure() {
         contentView.addSubview(usernameLabel)

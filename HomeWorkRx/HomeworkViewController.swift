@@ -16,7 +16,8 @@ final class HomeworkViewController: UIViewController {
     private let tableView = UITableView()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout())
     private let searchBar = UISearchBar()
-     
+    
+    private let viewModel = HomeworkViewModel()
     private let disposeBag = DisposeBag()
      
     override func viewDidLoad() {
@@ -26,11 +27,44 @@ final class HomeworkViewController: UIViewController {
     }
      
     private func bind() {
-        tableView.backgroundColor = .blue
-        collectionView.backgroundColor = .lightGray
+        let input = HomeworkViewModel.Input()
+        
+        let output = viewModel.transform(input: input)
+        
+        
+        output.users
+            .bind(to: tableView.rx.items) { (tableView, row, element) in
+                
+                guard let cell = tableView.dequeueReusableCell(withIdentifier: PersonTableViewCell.identifier) as? PersonTableViewCell else { return  UITableViewCell() }
+                cell.configureCell(name: element.name)
+                return cell
+            }
+            .disposed(by: disposeBag)
+        
+        tableView.rx.modelSelected(SampleUser.self)
+            .bind(to: input.tableViewTapped)
+            .disposed(by: disposeBag)
+        
+        output.selectedUsers
+            .bind(to: collectionView.rx.items(cellIdentifier: UserCollectionViewCell.identifier, cellType: UserCollectionViewCell.self)) { (row, element, cell) in
+                cell.configureCell(text: element.name)
+            }
+            .disposed(by: disposeBag)
+        
+        collectionView.rx.modelSelected(SampleUser.self)
+            .bind(to: input.collectionViewTapped)
+            .disposed(by: disposeBag)
+        
+        input.viewDidLoad.onNext(())
     }
     
+    
+    
     private func configure() {
+        
+        tableView.backgroundColor = .blue
+        collectionView.backgroundColor = .lightGray
+
         view.backgroundColor = .white
         view.addSubview(tableView)
         view.addSubview(collectionView)
