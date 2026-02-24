@@ -16,7 +16,7 @@ final class HomeworkViewModel {
     struct Input {
         let viewDidLoad = PublishSubject<Void>()
         let tableViewTapped = PublishSubject<SampleUser>()
-        let collectionViewTapped = PublishSubject<SampleUser>()
+        let searchBarReturn = PublishSubject<String>()
     }
     struct Output {
         let users: BehaviorSubject<[SampleUser]>
@@ -27,10 +27,11 @@ final class HomeworkViewModel {
         let users = makeUserList(event: input.viewDidLoad)
         let selectedUsers = makeSelectedUserList(event: input.tableViewTapped)
         
-        input.collectionViewTapped
-            .withLatestFrom(users) { tappedUser, currentUsers in
+        input.searchBarReturn
+            .map { SampleUser.init(name: $0, age: 0)}
+            .withLatestFrom(users) { newUser, currentUsers in
                 var newList = currentUsers
-                newList.append(tappedUser)
+                newList.append(newUser)
                 return newList
             }
             .bind(to: users)

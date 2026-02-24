@@ -31,7 +31,6 @@ final class HomeworkViewController: UIViewController {
         
         let output = viewModel.transform(input: input)
         
-        
         output.users
             .bind(to: tableView.rx.items) { (tableView, row, element) in
                 
@@ -51,14 +50,13 @@ final class HomeworkViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        collectionView.rx.modelSelected(SampleUser.self)
-            .bind(to: input.collectionViewTapped)
+        searchBar.rx.searchButtonClicked
+            .withLatestFrom(searchBar.rx.text.orEmpty)
+            .bind(to: input.searchBarReturn)
             .disposed(by: disposeBag)
-        
+                
         input.viewDidLoad.onNext(())
     }
-    
-    
     
     private func configure() {
         
